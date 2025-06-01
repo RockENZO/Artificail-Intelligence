@@ -1,0 +1,106 @@
+1. Wine Quality Prediction with 1NN (K-d Tree)
+Wine experts evaluate the quality of wine based on sensory data. We could also collect the features of wine from objective tests, thus, the objective features (simply called features hereafter) could be used to predict the expert’s judgment, which is the quality rating of the wine. This could be formed as a supervised learning problem by using the features as the data and the wine quality rating as the corresponding labels.
+
+In this assignment, we provide features obtained from physicochemical statistics for each white wine sample and its corresponding rating provided by wine experts. You are expected to implement the k-d tree (KDT) and use the training set to train your k-d tree, then provide wine quality prediction on the test set by searching the tree
+
+Wine quality rating is measured in the range of 0-9. In our dataset, we only keep the samples for quality ratings 5, 6, and 7. The 11 features are listed as follows [1]:
+
+f_acid: fixed acidity
+v_acid: volatile acidity
+c_acid: citric acid
+res_sugar: residual sugar
+chlorides: chlorides
+fs_dioxide: free sulfur dioxide
+ts_dioxide: total sulfur dioxide
+density: density
+pH: pH
+sulphates: sulphates
+alcohol: alcohol
+Explanation of the Data.
+train: The first 11 columns represent the 11 features and the 12th column is the wine quality. A sample of the data is depicted as follows:
+
+f_acid	v_acid	c_acid	res_sugar	chlorides	fs_dioxide	ts_dioxide	density	pH	sulphates	alcohol	quality
+8.10	0.270	0.41	1.45	0.033	11.0	63.0	0.99080	2.99	0.56	12.0	5
+8.60	0.230	0.40	4.20	0.035	17.0	109.0	0.99470	3.14	0.53	9.7	5
+7.90	0.180	0.74	1.20	0.040	16.0	75.0	0.99200	3.18	0.63	10.8	5
+8.30	0.420	0.62	19.25	0.040	41.0	172.0	1.00020	2.98	0.67	9.7	5
+6.50	0.310	0.14	7.50	0.044	34.0	133.0	0.99550	3.22	0.50	9.5	5
+test: The 12th column wine quality is not given to the test samples. A sample of the data is depicted as follows:
+
+f_acid	v_acid	c_acid	res_sugar	chlorides	fs_dioxide	ts_dioxide	density	pH	sulphates	alcohol
+7.0	0.360	0.14	11.60	0.043	35.0	228.0	0.99770	3.13	0.51	8.900000
+6.3	0.270	0.18	7.70	0.048	45.0	186.0	0.99620	3.23	0.47	9.000000
+7.2	0.290	0.20	7.70	0.046	51.0	174.0	0.99582	3.16	0.52	9.500000
+7.1	0.140	0.35	1.40	0.039	24.0	128.0	0.99212	2.97	0.68	10.400000
+7.6	0.480	0.28	10.40	0.049	57.0	205.0	0.99748	3.24	0.45	9.300000
+1.1. 1NN (K-d Tree)
+From the given training data, our goal is to learn a function that can predict the wine quality rating of a wine sample, based on the features. In this assignment, the predictor function will be constructed as a k-d tree. Since the features are continuously valued, you shall apply the k-d tree algorithm for continuous data, as outlined in Algorithm 1. It is the same as taught in the lecture. Once the tree is constructed, you will search the tree to find the 1-nearest neighbour of a query point and label the query point. Please refer to the search logic taught in the lecture to write your code for the 1NN search.
+
+Algorithm 1 BuildKdTree(P, D)
+Require: A set of points P of M dimensions and current depth D.
+ 1: if P is empty then
+ 2:   return null
+ 3: else if P only has one data point then
+ 4:   Create new node node
+ 5:   node.d ← d
+ 6:   node.val ← val
+ 7:   node.point ← current point
+ 8:   return node
+ 9: else
+10:   d ← D mod M
+11:   val ← Median value along dimension among points in P.
+12:   Create new node node.
+13:   node.d ← d
+14:   node.val ← val
+15:   node.point ← point at the median along dimension d
+16:   node.left ← BuildKdTree(points in P for which value at dimension d is less                         than or equal to val, D+1)
+17:   node.right ← BuildKdTree(points in P for which value at dimension d is equal to or greater than val, D+1)
+18:   return node
+19: end if
+Sorting (at each level) may not be necessary depending on your implementation. Google/ChatGPT for "Quickselect" if you are interested in implementing a K-d tree without doing the sorting. Full pre-sorting before building the k-d tree is another possible solution, but it is usually more complex. 
+
+For students whose student ID ends with an odd number, please implement Algorithm 1 with the yellow colored "or equal to" in line 16; you should ignore the blue colored "equal to or" in line 17.
+
+Likewise, for students whose student ID ends with an even number, please implement Algorithm 1 with the blue colored "equal to or" in line 17; you should ignore the yellow colored "or equal to" in line 16.
+
+We give you some hints to help you investigate if you are stuck or your implementation does not pass the Gradescope tests. 
+
+What is the median of an even number of values, say [1,2,3,4]? The median is 2.5. Does this surprise you? Perhaps verify it by using numpy.median(). This may potentially be a problem in implementing the median part in your Algorithm 1, depending on the implementation.
+Have you checked how your implementation behaves when there is more than one value that is equal to the median?
+Have you checked how your implementation behaves in extreme cases, such as when there are only two points or three points left to split? Why would your implementation run into an infinite loop by following Algorithm 1?
+1.3. Deliverable
+Write your k-d tree program in Python 3.10.6 in a file called nn_kdtree.py. Similar to the previous assignments, in your nn_kdtree.py, please define the two constants below; we will import them to correctly calculate your mark for the UG/PG variations and to determine the ID-based variation of Algorithm 1.
+
+STUDENT_ID = 'a1234567' # your student ID
+DEGREE = 'UG' # or PG if you are in the postgraduate course
+Your program must be able to run as follows:
+
+python3 nn_kdtree.py [train] [test] [dimension]
+The inputs/options to the program are as follows:
+
+[train] specifies the path to a file containing a set of training data
+[test] specifies the path to a file containing a set of testing data
+[dimension] is used to decide which dimension to start the comparison. (Algorithm 1)
+Given the inputs, your program must construct a k-d tree (following the prescribed algorithms) using the training data, then predict the quality rating of each of the wine samples in the testing data.
+
+Your program must print two sections of content to standard output (i.e., the command prompt):
+
+1. The number of points in the left and right trees after the first split of the k-d tree. An example format is:
+
+....l487
+....r412
+The number of '.' to print is indicated by D in Algorithm 1, here D = 4 in this example. 'l' and 'r' denote the left and right subtrees, respectively. The numbers indicate the number of points in each subtree.
+
+2. The list of predicted wine quality ratings, vertically based on the order in which the testing cases appear in [test]. An example format is in sample_data/test-sample-result.
+
+5
+5
+5
+To summarise, the full expected output format would be:
+
+....l487
+....r412
+5
+5
+5
+We will match both output sections to our expected result (i.e., ground truth). We match the point split result because choosing a different D will result in a different split, but the prediction does not necessarily change. If your output does not match the expected, we will not show you the correct prediction. We will only show you the first-level tree split result to help you debug.
